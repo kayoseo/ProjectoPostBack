@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 
 //rutas
 app.get('/post', (req, res) => {
-    db.any('SELECT name,description from post')
+    db.any('SELECT name,description from post ORDER BY datecreate desc')
         .then(function (data) {
             res.status(200).send({
                 message: data
@@ -46,7 +46,7 @@ app.get('/post', (req, res) => {
 
 })
 app.post('/post', (req, res) => {
-    db.query('insert into post (name, description, dateCreate) values ($1, $2,CURRENT_DATE)', [req.body.name, req.body.description])
+    db.query('insert into post (name, description, dateCreate) values ($1, $2,CURRENT_TIMESTAMP)', [req.body.name, req.body.description])
         .then(function (data) {
             res.status(200).send({
                 name: req.body.name, description: req.body.description
@@ -56,7 +56,7 @@ app.post('/post', (req, res) => {
             console.log('ERROR:', error)
             if (error.code === "23505") {
                 res.status(409).send({
-                    error: `Ya existe un post con nombre: ${req.body.name}`
+                    error: `Ya existe un post con ese nombre: ${req.body.name}`
                 })
             }
             res.status(409).send({
@@ -67,8 +67,7 @@ app.post('/post', (req, res) => {
 })
 
 app.delete('/post', (req, res) => {
-
-    db.any('SELECT name,description from post where name=$1', req.body.name)
+   db.any('SELECT name,description from post where name=$1', req.body.name)
         .then(function (data) {
             if (data.length > 0) {
                 postDeleted = data;
@@ -88,7 +87,7 @@ app.delete('/post', (req, res) => {
         })
         .catch(function (error) {
             console.log('ERROR:', error)
-        })
+        }) 
 
 
 })
